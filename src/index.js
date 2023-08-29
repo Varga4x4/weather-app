@@ -138,7 +138,7 @@ const clearButtonElement = document.querySelector('#clear-button')
 const favouriteButtonElement = document.querySelector('#favourite-button')
 //
 
-// HELPERS
+// SMALL HELPERS
 const getShouldDisplayImperial = () =>
     unitSwitchButtonElement.innerText === BUTTON_LABELS.unitButtons.metric
 const getSearchQuery = () => searchFieldElement.value
@@ -148,7 +148,7 @@ const getShouldShowFavsOnly = () =>
     favouriteButtonElement.innerText === BUTTON_LABELS.favs.on
     //
     ; (() => {
-        // HELPERS
+        // BIG HELPERS
         const renderTiles = (
             shouldShowAll,
             shouldDisplayImperial,
@@ -288,9 +288,29 @@ const getShouldShowFavsOnly = () =>
         //
 
         let favouriteCities = []
+        let appliedSearchQuery = ''
 
         // CLEAR_BUTTON_ELEMENT
         clearButtonElement.disabled = true
+        clearButtonElement.onclick = () => {
+            appliedSearchQuery = ''
+            searchFieldElement.value = appliedSearchQuery
+
+            searchButtonElement.disabled = true
+            clearButtonElement.disabled = true
+
+            const currentShouldShowAll = getShouldShowAll()
+            const shouldDisplayImperial = getShouldDisplayImperial()
+            const searchQuery = getSearchQuery()
+            const shouldShowFavsOnly = getShouldShowFavsOnly()
+
+            renderTiles(
+                currentShouldShowAll,
+                shouldDisplayImperial,
+                searchQuery,
+                shouldShowFavsOnly
+            )
+        }
         //
 
         // FAVOURITE_BUTTON_ELEMENT
@@ -365,7 +385,8 @@ const getShouldShowFavsOnly = () =>
         // SEARCH_BUTTON_ELEMENT
         searchButtonElement.disabled = true
         searchButtonElement.onclick = () => {
-            const searchQuery = getSearchQuery()
+            appliedSearchQuery = getSearchQuery()
+
             const shouldShowAll = getShouldShowAll()
             const shouldDisplayImperial = getShouldDisplayImperial()
             const shouldShowFavsOnly = getShouldShowFavsOnly()
@@ -373,7 +394,7 @@ const getShouldShowFavsOnly = () =>
             renderTiles(
                 shouldShowAll,
                 shouldDisplayImperial,
-                searchQuery,
+                appliedSearchQuery,
                 shouldShowFavsOnly
             )
         }
@@ -382,9 +403,10 @@ const getShouldShowFavsOnly = () =>
         // INPUT_EVENT_LISTENER
         searchFieldElement.addEventListener('input', () => {
             const currentNumberOfCharsInSearchField = searchFieldElement.value.length
+            const areWeAfterSearching = !!appliedSearchQuery.length
 
             searchButtonElement.disabled = !(currentNumberOfCharsInSearchField > 2)
-            clearButtonElement.disabled = !currentNumberOfCharsInSearchField
+            clearButtonElement.disabled = areWeAfterSearching ? false : !currentNumberOfCharsInSearchField
         })
 
         // INITAL_TILES_RENDER
